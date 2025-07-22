@@ -1,0 +1,22 @@
+name: flutter_web_bridge_example
+publish_to: 'none'
+description: 示例工程，演示 flutter_web_bridge 的用法
+version: 0.1.0
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.10.0"
+platforms:
+  web:
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_web_bridge:
+    path: ../
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true 

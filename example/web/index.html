@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>flutter_web_bridge Example</title>
+  <meta name="description" content="A new Flutter project.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+  <script>
+
+    const storageKey = 'dataSync';
+    // 初始化数据
+    const data = (() => {
+      try {
+        return JSON.parse(localStorage.getItem(storageKey)) || {};
+      } catch (e) {
+        console.warn('解析 localStorage 数据失败', e);
+        return {};
+      }
+    })();
+
+    // 创建深度代理
+    function createPersistentProxy(target, key) {
+      let saveTimeout;
+      return new Proxy(target, {
+        get(target, prop) {
+          const value = target[prop];
+          if (typeof value === 'object' && value !== null) {
+            return createPersistentProxy(value, `${key}.${prop}`);
+          }
+          return value;
+        },
+        set(target, prop, value) {
+          target[prop] = value;
+          // 防抖保存
+          clearTimeout(saveTimeout);
+          saveTimeout = setTimeout(() => {
+            try {
+              localStorage.setItem(key, JSON.stringify(target));
+            } catch (e) {
+              console.error('写入存储失败:', e);
+            }
+          }, 100);
+          
+          return true;
+        }
+      });
+    }
+
+    // 创建代理
+    var proxy = createPersistentProxy(data, storageKey);
+
+    window.setProxyItem = function(value) {
+      proxy[storageKey] = value;
+    };
+    window.getProxyItem = function() {
+      return proxy[storageKey];
+    };
+
+    // Flutter 调用此函数
+    window.onFlutterMessage = function(name) {
+      return "Hello, " + name + " from JS!";
+    };
+
+    // JS 主动向 Flutter 发送消息
+    function sendToFlutter() {
+      if (window.JSBridge && window.JSBridge.onJSMessage) {
+        window.JSBridge.onJSMessage('你好，Flutter！');
+      }
+    }
+  </script>
+  <button onclick="sendToFlutter()">JS 主动发消息给 Flutter</button>
+  <script src="main.dart.js" type="application/javascript"></script>
+</body>
+</html> 
