@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_web_bridge/flutter_web_bridge.dart';
 
@@ -31,15 +32,20 @@ class _WebBridgeDemoState extends State<WebBridgeDemo> {
     super.initState();
     // 暴露 Dart 方法给 JS 调用
     JSBridge.exposeToJS('onJSMessage', (msg) {
+      print('onJSMessage: $msg');
       setState(() {
         _messageFromJS = msg.toString();
       });
+      return jsonEncode({'name': 'Allen', 'age': 18});
     });
   }
 
   void _callJS() async {
-    // 调用 JS 的 onFlutterMessage
-    final result = await JSBridge.callFunction('onFlutterMessage', ['Allen']);
+    // 调用 JS 的 onJSMessage
+    final result = await JSBridge.callFunction('onJSMessage', ['Allen']);
+    print('result: $result');
+    print('result: ${result.runtimeType}');
+
     setState(() {
       _resultFromJS = result.toString();
     });

@@ -1,5 +1,6 @@
 import 'dart:js' as js;
 import 'dart:js_util' as js_util;
+import 'dart:html' as html;
 
 /// Flutter 与 JS 的桥接工具类
 class JSBridge {
@@ -16,5 +17,10 @@ class JSBridge {
   /// 注册 Dart 函数到 JS 全局变量（让 JS 调用 Dart）
   static void exposeToJS(String name, Function function) {
     js.context[name] = js.allowInterop(function);
+  }
+
+  static void sendMessage(String message,
+      {String functionName = 'sendMessage'}) {
+    js_util.callMethod(html.window, functionName, [message]);
   }
 }

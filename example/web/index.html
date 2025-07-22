@@ -60,7 +60,10 @@
 
     // Flutter 调用此函数
     window.onFlutterMessage = function(name) {
-      return "Hello, " + name + " from JS!";
+      return JSON.stringify({
+        name: "Allen",
+        age: 18
+      });
     };
 
     // JS 主动向 Flutter 发送消息
